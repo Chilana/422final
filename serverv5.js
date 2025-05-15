@@ -14,7 +14,7 @@ app.use(express.json()); // Add this to parse JSON bodies
 
 // Google Cloud Storage configuration
 const storage = new Storage();
-const bucketName = '422proj4-bucket'; // Replace with your Google Cloud Storage bucket name
+const bucketName = '422final-bucket'; // Replace with your Google Cloud Storage bucket name
 const bucket = storage.bucket(bucketName);
 
 // Create a connection pool to the database
