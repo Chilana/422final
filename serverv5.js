@@ -22,7 +22,7 @@ const pool = mysql.createPool({
   user: 'root',
   password: '422',
   database: 'project4',
-  socketPath: `/cloudsql/proj4-456020:us-central1:quickstart-instance`,
+  socketPath: `/cloudsql/terraformfinal-459903:us-central1:gallery-sql`,
 });
 
 // Setup Multer for memory storage (no filesystem storage)
