@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Photo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            text-align: center;
+        }
+        .upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            padding: 10px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .back-btn {
+            background-color: #2196F3;
+        }
+        .back-btn:hover {
+            background-color: #1e88e5;
+        }
+    </style>
+</head>
+<body onload="loadPosts()">
+    <h2>Upload Your Photo</h2>
+    
+    <!-- Upload Form Container -->
+    <div class="upload-container">
+        <!-- Display Username -->
+        <p>Welcome, <span id="usernameDisplay"></span></p>
+        
+        <!-- Photo Name Input -->
+        <input type="text" id="photoName" placeholder="Enter photo name" required>
+        
+        <!-- File Input for Photo Upload -->
+        <input type="file" name="imgfile" accept="image/jpeg" id="imgfile" required>
+        
+        <!-- Submit Button -->
+        <button id="submitBtn">Submit</button>
+        
+        <!-- Back to Photos Page Button -->
+        <button class="back-btn" onclick="goBackToPhotos()">Back to Photos</button>
+    </div>
+
+    <script>
+        // Get user data from localStorage (set during login)
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        // If user data is not found, redirect to the login page
+        if (!user) {
+            alert('You need to log in first.');
+            window.location.href = 'index.html'; // Redirect to login page if not logged in
+        } else {
+            // Display the logged-in user's username
+            document.getElementById('usernameDisplay').textContent = user.username;
+        }
+
+        // Function to go back to the photos page
+        function goBackToPhotos() {
+            window.location.href = 'photos.html';
+        }
+
+        // Existing code for submit button
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('imgfile');
+            const photoNameInput = document.getElementById('photoName');
+            const photoName = photoNameInput.value.trim();
+            const file = fileInput.files[0];
+
+            // Ensure both fields are filled before submitting
+            if (!file || !photoName) {
+                alert('Please provide both a photo and a name.');
+                return;
+            }
+
+            // Create FormData to send the photo and its name
+            const formData = new FormData();
+            formData.append('imgfile', file);
+            formData.append('photoName', photoName);
+            formData.append('username', user.username); // Include the username as part of the upload
+
+            // Submit the photo to the server (replace with your backend API)
+            fetch('https://proj4-456020.uc.r.appspot.com/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Photo uploaded successfully!');
+                    photoNameInput.value = ''; // Clear the input field
+                    fileInput.value = ''; // Clear the file input
+                } else {
+                    alert('Failed to upload photo. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading photo:', error);
+                alert('Error uploading photo. Please try again.');
+            });
+        });
+
+        // Function to load posts (optional - you can adjust as per your need)
+        function loadPosts() {
+            // Placeholder function if required for other logic
+        }
+    </script>
+</body>
+</html>
+

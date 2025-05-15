@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Photos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #photosContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .photo-item {
+            text-align: center;
+        }
+        .photo-item img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Photos</h1>
+    
+    <!-- Search Bar for filtering photos by name -->
+    <div class="search-bar">
+        <label for="search">Search photos by name:</label>
+        <input type="text" id="search" placeholder="Enter photo name" oninput="filterPhotos()">
+    </div>
+
+    <!-- Display Username -->
+    <div>
+        <p>Welcome, <span id="usernameDisplay"></span></p>
+    </div>
+
+    <div id="photosContainer">
+        <!-- Uploaded photos will be displayed here -->
+    </div>
+
+    <div>
+        <button onclick="goToUploadPage()">Go to Upload Page</button>
+    </div>
+
+    <script>
+        // Get user data from localStorage (set during login)
+        const user = JSON.parse(localStorage.getItem('user'));
+        
+        // If user data is not found, redirect to the login page
+        if (!user) {
+            alert('You need to log in first.');
+            window.location.href = 'index.html'; // Redirect to login page if not logged in
+        } else {
+            // Display the logged-in user's username
+            document.getElementById('usernameDisplay').textContent = user.username;
+            
+            // Function to navigate to upload.html page and pass the username through localStorage
+            function goToUploadPage() {
+                // Store username in localStorage
+                localStorage.setItem('user', JSON.stringify(user));  // Ensure the user data is saved in localStorage
+                window.location.href = 'upload.html';  // Navigate to upload page
+            }
+
+            // Fetch photos for the logged-in user
+            fetchPhotos(user.username);
+        }
+
+        let photosData = []; // Store the photos globally to filter them later
+
+        async function fetchPhotos(username) {
+            const response = await fetch(`https://proj4-456020.uc.r.appspot.com/api/photos?userId=${username}`);
+            if (!response.ok) {
+                alert('Error fetching photos');
+                return;
+            }
+
+            const data = await response.json();
+            photosData = data.photos; // Store the photos in the global variable
+
+            const photosContainer = document.getElementById('photosContainer');
+            photosContainer.innerHTML = ''; // Clear any previous photos
+
+            if (photosData.length === 0) {
+                photosContainer.innerHTML = '<p>No photos uploaded yet!</p>';
+                return;
+            }
+
+            displayPhotos(photosData);
+        }
+
+        function displayPhotos(photos) {
+            const photosContainer = document.getElementById('photosContainer');
+            photosContainer.innerHTML = ''; // Clear current photos
+
+            photos.forEach((photo) => {
+                const photoItem = document.createElement('div');
+                photoItem.classList.add('photo-item');
+
+                const imgElement = document.createElement('img');
+                imgElement.src = photo.photo_url; // URL of the photo uploaded to Google Cloud
+                imgElement.alt = photo.photo_name;
+
+                const photoName = document.createElement('p');
+                photoName.textContent = photo.photo_name;
+
+                photoItem.appendChild(imgElement);
+                photoItem.appendChild(photoName);
+                photosContainer.appendChild(photoItem);
+            });
+        }
+
+        function filterPhotos() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            const filteredPhotos = photosData.filter((photo) =>
+                photo.photo_name.toLowerCase().includes(searchValue)
+            );
+            displayPhotos(filteredPhotos); // Update the displayed photos with the filtered results
+        }
+    </script>
+</body>
+</html>
+
