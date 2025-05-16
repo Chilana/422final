@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
@@ -19,7 +21,7 @@ const bucket = storage.bucket(bucketName);
 
 // Create a connection pool to the database
 const pool = mysql.createPool({
-  user: 'root',
+  user: 'galleryadmin',
   password: '422',
   database: 'project4',
   socketPath: `/cloudsql/terraformfinal-459903:us-central1:gallery-sql`,
