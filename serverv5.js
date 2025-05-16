@@ -94,7 +94,7 @@ app.post('/api/listing', upload.single('image'), async (req, res) => {
         const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
         const { mainCategory: main, subCategory: sub } = jsonData;
 
-        const insertQuery = 'INSERT INTO items (main, sub, json, imageUrl) VALUES (?, ?, ?, ?)';
+        const insertQuery = 'INSERT INTO things (main, sub, json, imageUrl) VALUES (?, ?, ?, ?)';
         pool.getConnection((err, connection) => {
           if (err) return res.status(500).json({ error: 'Database connection failed' });
           connection.execute(insertQuery, [main, sub, JSON.stringify(jsonData), publicUrl], (err) => {
@@ -126,7 +126,7 @@ app.post('/api/bulk-insert', async (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) return res.status(500).json({ error: 'Database connection failed' });
 
-    const insertQuery = 'INSERT INTO items (main, sub, json, imageUrl) VALUES (?, ?, ?, ?)';
+    const insertQuery = 'INSERT INTO things (main, sub, json, imageUrl) VALUES (?, ?, ?, ?)';
     try {
       listings.forEach(item => {
         const { mainCategory: main, subCategory: sub, imageUrl = '' } = item;
@@ -147,7 +147,7 @@ app.post('/api/bulk-insert', async (req, res) => {
   app.get(`/api/${route}`, (req, res) => {
     pool.getConnection((err, connection) => {
       if (err) return res.status(500).json({ error: 'Database connection failed' });
-      const query = `SELECT * FROM items WHERE main='${route.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}'`;
+      const query = `SELECT * FROM things WHERE main='${route.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}'`;
       connection.execute(query, [], (err, results) => {
         connection.release();
         if (err) return res.status(500).json({ error: 'Failed to fetch listings' });
